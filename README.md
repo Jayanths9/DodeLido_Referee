@@ -1,4 +1,7 @@
 # Dodelido_openv
+## link to Dataset : https://drive.google.com/file/d/1neRs9rxjZBj3Mgrhrn2yiH2G3o-cbTla/view?usp=sharing
+---
+## TODO
 - [X] Capture images of dodelido cards 
 - [x] resize and label images 
 - [x] Augmented images and create coressponding labels 
