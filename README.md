@@ -4,7 +4,7 @@
 ### TODO
 - [X] Capture images of dodelido cards. 
 - [x] Resize and label images.
-- [ ] Augmented images and create coressponding labels.
+- [X] Augmented images and create coressponding labels.
 - [ ] Train neural network to detect single single card.
 - [ ] Train neural network to detect three cards.
 - [ ] Write python logic to guess the outcome based on three cards, e.g Blue, Lion , Dodelio etc.
