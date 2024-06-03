@@ -1,0 +1,11 @@
+numpy
+opencv-python
+matplotlib
+pandas
+numpy
+joblib
+simplejson
+pypatch
+albumentations
+keras
+tensorflow
