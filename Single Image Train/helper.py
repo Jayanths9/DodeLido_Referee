@@ -1,5 +1,8 @@
 import tensorflow as tf
+import numpy as np
 
+AUTOTUNE = tf.data.experimental.AUTOTUNE  # Adapt preprocessing
+SHUFFLE_BUFFER_SIZE = 1024  # Shuffle the training data by a chunck of 1024.
 
 @tf.function
 def macro_soft_f1(y, y_hat):
@@ -48,7 +51,7 @@ def macro_f1(y, y_hat, thresh=0.5):
     return macro_f1
 
 
-def parse_function(filename, label):
+def parse_function(filename, label, channels, img_size):
     """Function that returns a tuple of normalized image array and labels
     array.
 
@@ -60,15 +63,16 @@ def parse_function(filename, label):
     # Read an image from a file
     image_string = tf.io.read_file(filename)
     # Decode it into a dense vector
-    image_decoded = tf.image.decode_jpeg(image_string, channels=CHANNELS)
+    image_decoded = tf.image.decode_jpeg(image_string, channels=channels)
     # Resize it to fixed shape
-    image_resized = tf.image.resize(image_decoded, [IMG_SIZE, IMG_SIZE])
+    image_resized = tf.image.resize(image_decoded, [img_size,  img_size])
     # Normalize it from [0, 255] to [0.0, 1.0]
     image_normalized = image_resized / 255.0
     return image_normalized, label
 
 
-def create_dataset(filenames, labels, is_training=True):
+def create_dataset(filenames, labels, channels,
+                   img_size, img_dir, batch_size, is_training=True):
     """Load and parse dataset.
 
     Args:
@@ -76,10 +80,11 @@ def create_dataset(filenames, labels, is_training=True):
         labels: numpy array of shape (BATCH_SIZE, N_LABELS)
         is_training: boolean to indicate training mode
     """
-    filenames = image_dir + filenames
+    filenames = img_dir + filenames
 
     # Create a first dataset of file paths and labels
-    dataset = tf.data.Dataset.from_tensor_slices((filenames, labels))
+    dataset = tf.data.Dataset.from_tensor_slices((filenames, labels,
+                                                  channels, img_size))
     # Parse and preprocess observations in parallel
     dataset = dataset.map(parse_function, num_parallel_calls=AUTOTUNE)
 
@@ -90,8 +95,37 @@ def create_dataset(filenames, labels, is_training=True):
         dataset = dataset.shuffle(buffer_size=SHUFFLE_BUFFER_SIZE)
 
     # Batch the data for multiple steps
-    dataset = dataset.batch(BATCH_SIZE)
+    dataset = dataset.batch(batch_size)
     # Fetch batches in the background while the model is training.
     dataset = dataset.prefetch(buffer_size=AUTOTUNE)
 
     return dataset
+
+
+def read_image(image_object, img_size, model, mlb, threshold):
+    image_resized = tf.image.resize(image_object,[img_size, img_size])
+    # Normalize it from [0, 255] to [0.0, 1.0]
+    image_normalized = image_resized / 255.0
+    expanded_tensor = tf.expand_dims(image_normalized, axis=0)
+    ouptut = model.predict(expanded_tensor)
+    result_list = list(ouptut)
+    binary_array = np.where(np.array(result_list) > threshold, 1, 0)
+    result = mlb.inverse_transform(binary_array)
+    print(result)
+
+
+def filter_overlapping_circles(circles, min_dist_between_circles):
+    filtered_circles = []
+    for circle in circles[0]:
+        x, y, r = circle
+        overlap = False
+        for fc in filtered_circles:
+            fx, fy, fr = fc
+            distance = np.sqrt((x - fx) ** 2 + (y - fy) ** 2)
+            if distance < min_dist_between_circles:
+                overlap = True
+                break
+        if not overlap:
+            filtered_circles.append(circle)
+
+    return filtered_circles
