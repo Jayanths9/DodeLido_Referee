@@ -1,6 +1,0 @@
-This folder consists of Single Image Training for the Dodelido Dataset using
-the MultiLabelBinarizer.
-
-1. Use install_dependencies to download all necessary library files.
-2. Install the dataset for single Image in the path "./Dataset/".
-3. Run the file main.py

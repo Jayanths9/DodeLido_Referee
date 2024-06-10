@@ -7,7 +7,7 @@
 - [x] Resize and label images.
 - [X] Augmented images and create coressponding labels.
 - [X] Train neural network to detect single single card.
-- [ ] Write python logic to guess the outcome based on three cards, e.g Blue, Lion , Dodelio etc.
+- [X] Write python logic to guess the outcome based on three cards, e.g Blue, Lion , Dodelio etc.
 
 
 ### Detect Single card
