@@ -1,5 +1,8 @@
 import tensorflow as tf
+import cv2
 import numpy as np
+
+from collections import Counter
 
 AUTOTUNE = tf.data.experimental.AUTOTUNE  # Adapt preprocessing
 SHUFFLE_BUFFER_SIZE = 1024  # Shuffle the training data by a chunck of 1024.
@@ -129,3 +132,104 @@ def filter_overlapping_circles(circles, min_dist_between_circles):
             filtered_circles.append(circle)
 
     return filtered_circles
+
+
+def load_image(VideoCapture=False):
+    """Returns either saved image or real time camera image
+    if VideoCapture is True.
+
+        Args:
+            VideoCapture: Boolean; True/False
+
+        Returns:
+            cap: [w x h x n] N-dimensional image
+        """
+
+    if VideoCapture == True:
+       image = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+
+       if not cap.isOpened():
+          print("Error opening camera")
+          exit()
+    else:
+       image = cv2.imread('./Dataset/trialImage3.JPG')
+       image = cv2.resize(image, (1280, 720))
+
+    return image
+
+
+def get_dominant_color(frame, x, y, r):
+    """
+    Calculates the average color (BGR) within a circle region.
+
+    Args:
+        frame: The original color frame.
+        x, y, r: Circle center coordinates and radius.
+
+    Returns:
+        A tuple containing the average BGR color values.
+    """
+    top_left = (x - r, y - r)
+    bottom_right = (x + r, y + r)
+    circle_roi = frame[top_left[1]:bottom_right[1], top_left[0]:bottom_right[0]]
+    return cv2.mean(circle_roi)
+
+
+def calculate_dodelido_output(output_list):
+    """
+    Calculates the output of Dodelido game.
+
+    Args:
+        output_list: 3x2 n-D Array. Predicted outputs from the model.
+
+    Returns:
+        Output: String value containing the output if dodelido game.
+    """
+    element_counts = Counter(output_list)
+
+    if "Alarm" in output_list:
+        return "Alarm"
+
+    sloth_count = element_counts["Sloth"]
+
+    if sloth_count > 0:
+
+        if sloth_count == 1:
+            dode_output = "Oh-"
+        elif sloth_count == 2:
+            dode_output = "Oh-Oh-"
+        elif sloth_count == 3:
+            dode_output = "Oh-Oh-Oh-"
+        # Remove Sloth from list
+
+    else:
+        dode_output = ""
+
+    element_counts.subtract(["Sloth"])
+    max_count = max(element_counts.values())
+
+    # Find the element(s) with the maximum count (considering first instance)
+    max_value_elements = [element for element, count in element_counts.items()
+                          if count == max_count and element_counts[
+                              element] == count]
+
+    # Print the maximum count and element(s) (if there are multiple)
+    if max_value_elements:
+
+        if len(max_value_elements) > 1:
+            if max_count >= len(max_value_elements):
+                element = "DODELIDO"
+            elif max_count == 1:
+                element = "Nothing"
+            else:
+                element = max_value_elements
+        else:
+            element = max_value_elements[0]
+
+        print(f"Element: {element} (Maximum count: {max_count})")
+
+    else:
+        element = "Nothing"
+        print("No elements were repeated")
+
+    return dode_output + str(element)

@@ -1,4 +1,3 @@
-<a href="https://colab.research.google.com/github/Jayanths9/Dodelido_opencv/blob/main/Jay_Single_Image_Train.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
 # Importing Library Files
 import albumentations as A
 import cv2
