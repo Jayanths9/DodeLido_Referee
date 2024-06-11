@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import cv2
 import numpy as np
 import tensorflow as tf
@@ -67,7 +67,7 @@ color = (0, 255, 0)  # Green
 
 
 # In order to read a saved image from storage
-cap = cv2.imread('./Dataset/IMG_2.JPG')
+cap = cv2.imread('./Dataset/trialImage3.JPG')
 cap = cv2.resize(cap, (1280, 720))
 
 
@@ -155,28 +155,54 @@ import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
 # Create a GUI app 
-app = tk.Tk(className="Dode Lido Judge") 
+app = tk.Tk(className=" Dode Lido Referee") 
   
 # Bind the app with Escape keyboard to 
 # quit app whenever pressed 
 app.bind('<Escape>', lambda e: app.quit()) 
 app.geometry("1280x850")
   
-photo = tk.PhotoImage(file='./Dataset/screen.png', master=app)
+photo = tk.PhotoImage(file='./Dataset/WelcomeScreen.png', master=app)
 # Create a label and display it on app 
 label_widget = Label(app, padx=10, pady= 10, image=photo)
 label_widget.pack() 
 
 # Create a label widget for displaying text
-text_label = Label(app, text="Dode Lido Judge")
+text_label = Label(app, text="Dode Lido Referee")
 text_label.pack(side=BOTTOM, anchor="se", pady=5, padx=5)  # Place the label on the right side
 
 
 
 def open_camera(): 
-  
-    # Capture the video frame by frame 
-    #_, frame = cap.read()
+    """
+     This function captures video frames from a camera, detects circles, 
+        classifies them using a model, and displays the results on a label.
+
+        It performs the following steps:
+
+        1. Captures a frame from the camera (assuming `cap` is a configured VideoCapture object).
+        2. Converts the frame from BGR to grayscale for circle detection.
+        3. Applies Gaussian blurring for noise reduction.
+        4. Detects circles using Hough Circle Transform with specified parameters.
+        5. Iterates over detected circles:
+            - Isolates the Region of Interest (ROI) around each circle in color.
+            - Preprocesses the ROI (resize, normalize) for the classification model.
+            - Makes a prediction using the model and gets class probabilities.
+            - Sorts predictions in descending order and retrieves top two classes.
+            - Draws a bounding box around the detected circle.
+            - Calculates the dominant color within the circle.
+            - Displays the top two class names, probabilities, and dominant color on the frame.
+        6. Updates a label with the combined class and color information.
+        7. Calculates an output using the `calculate_dodelido_output` function (replace with your implementation).
+        8. Updates another label with the `dodelido` output.
+        9. Converts the frame to a PIL Image object.
+        10. Creates a PhotoImage object from the Image.
+        11. Updates the label widget with the new PhotoImage object.
+        12. Schedules the function to be called again after 10 seconds for continuous processing.
+        13. If no circles are detected, prints a message.
+    """
+
+    #_, frame = cap.read()   #Uncomment this to read from Live Camera
     frame = cap
     b,g,r = cv2.split(frame)
     frame = cv2.merge((r,g,b))
@@ -289,7 +315,7 @@ button2 = ttk.Button(app, text="Close Window", command=close_window, width=butto
 
 
 # Create a label widget for displaying text
-output_label = Label(app, text="Dode Lido Judge", font =("Roboto", 14, "bold"), padx=10, pady= 10, width = 25, bg = "light cyan")
+output_label = Label(app, text="Dode Lido Referee", font =("Roboto", 14, "bold"), padx=10, pady= 10, width = 25, bg = "light cyan")
 output_label.pack(side="right", padx= 10, pady= 10)  # Place the label on the right side
 
 # Place buttons at the bottom, side-by-side
@@ -303,6 +329,3 @@ app.mainloop()
 # Release capture object and close all windows
 cap.release()
 cv2.destroyAllWindows()
-=======
-# Testing of the model with GUI
->>>>>>> 78f17fa9c01d8a92ff4c7e1c5c01de3120d1c073
