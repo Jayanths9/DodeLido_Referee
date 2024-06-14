@@ -21,15 +21,15 @@ tf.random.set_seed(seed)
 def main():
     parser = argparse.ArgumentParser(description="Configure the script parameters.")
     parser.add_argument("--label", type=str, default="labels.json", help="Path to the labels file.")
-    parser.add_argument("--image", type=str, default="dataset/", help="Directory containing the images.")
+    parser.add_argument("--image", type=str, default="dataset", help="Directory containing the images.")
     parser.add_argument("--batchsize", type=int, default=100, help="Batch size for training.")
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping.")
     parser.add_argument("--lr", type=float, default=5e-4, help="Learning rate for training.")
     args = parser.parse_args()
 
-    label_path = args.label_path
-    image_dir = args.image_dir
-    BATCH_SIZE = args.batch_size
+    label_path = args.label
+    image_dir = args.image
+    BATCH_SIZE = args.batchsize
     PATIENCE = args.patience
     LR = args.lr
 
