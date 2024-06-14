@@ -22,41 +22,11 @@ class_names = ["Alarm", "Blue", "Flamingo", "Giraffe", "Green", "Grey", "Lion",
 color = (0, 255, 0)  # Green
 
 
+
 def open_camera():
     """
      This function captures video frames from a camera, detects circles,
         classifies them using a model, and displays the results on a label.
-
-        It performs the following steps:
-
-        1. Captures a frame from the camera (assuming `cap` is a configured
-           VideoCapture object).
-        2. Converts the frame from BGR to grayscale for circle detection.
-        3. Applies Gaussian blurring for noise reduction.
-        4. Detects circles using Hough Circle Transform with specified
-           parameters.
-        5. Iterates over detected circles:
-            - Isolates the Region of Interest (ROI) around each circle in
-              color.
-            - Preprocesses the ROI (resize, normalize) for the classification
-              model.
-            - Makes a prediction using the model and gets class probabilities.
-            - Sorts predictions in descending order and retrieves top two
-              classes.
-            - Draws a bounding box around the detected circle.
-            - Calculates the dominant color within the circle.
-            - Displays the top two class names, probabilities, and dominant
-              color on the frame.
-        6. Updates a label with the combined class and color information.
-        7. Calculates an output using the `calculate_dodelido_output` function
-           (replace with your implementation).
-        8. Updates another label with the `dodelido` output.
-        9. Converts the frame to a PIL Image object.
-        10. Creates a PhotoImage object from the Image.
-        11. Updates the label widget with the new PhotoImage object.
-        12. Schedules the function to be called again after 10 seconds for
-            continuous processing.
-        13. If no circles are detected, prints a message.
     """
 
     # _, frame = cap.read()   #Uncomment this to read from Live Camera
