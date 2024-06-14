@@ -81,10 +81,10 @@ def calculate_dodelido_output(output_list):
         Output: String value containing the output if dodelido game.
     """
     element_counts = Counter(output_list)
-    if "Alarm" in output_list:
+    if "alarm" in output_list:
         return "Alarm"
 
-    sloth_count = element_counts["Sloth"]
+    sloth_count = element_counts["sloth"]
 
     if sloth_count > 0:
 
@@ -99,7 +99,7 @@ def calculate_dodelido_output(output_list):
     else:
         dode_output = ""
 
-    element_counts.subtract(["Sloth"])
+    element_counts.subtract(["sloth"])
     max_count = max(element_counts.values())
 
     # Find the element(s) with the maximum count (considering first instance)
