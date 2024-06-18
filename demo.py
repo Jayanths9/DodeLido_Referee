@@ -166,7 +166,7 @@ def camera_input(model, classifier, cap):
         text_class = []
         text_color = []
         text_class_prob = []
-                
+
         # Loop over all detected circles
         for circle in filtered_circles:
 
@@ -174,15 +174,15 @@ def camera_input(model, classifier, cap):
             x, y, r = circle
 
             # Draw the bounding box around the circle
-            x1 = x - r-buffer
-            y1 = y - r-buffer
-            x2 = x + r+buffer
-            y2 = y + r+buffer
+            x1 = x - r - buffer
+            y1 = y - r - buffer
+            x2 = x + r + buffer
+            y2 = y + r + buffer
 
-            # crop out the card image
+            # Crop out the card image
             new_image = cv2.cvtColor(frame[y1:y2, x1:x2], cv2.COLOR_BGR2RGB)
 
-            # predit the class of cropped card image
+            # Predict the class of the cropped card image
             class_names, confidence_scores = model_lite_predict(interpreter=interpreter, image=new_image, classifier=mlb)
 
             # Draw the bounding box on the original image
@@ -192,24 +192,23 @@ def camera_input(model, classifier, cap):
             top_two_classes = class_names[:2]
             top_two_confidences = confidence_scores[:2]
 
-            # Get dominant color within circle
+            # Get dominant color within the circle
             bgr_color = get_dominant_color(new_image, r, y, x)
 
             # Display top two class names, probabilities, dominant color (BGR)
             y_offset = 20  # Adjust offset based on font size
             for j, (class_name, confidence) in enumerate(zip(top_two_classes, top_two_confidences)):
-                if confidence > 0.3:
+                if confidence > 0.5:
                     text_class1 = f"{class_name}: {confidence:.2f}"
-                    text_class2 = f"{class_name}"
+                    text_class2 = class_name  # Extract class name as a simple string
                     text_color1 = f"BGR: ({int(bgr_color[0])}, {int(bgr_color[1])}, {int(bgr_color[2])})"
                     cv2.putText(frame, text_class1, (x1, y1 - y_offset * (j + 1)),
                                 cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 1)
 
                     text_class_prob.append(text_class1)
-                    text_class.append(text_class2)
+                    text_class.append(text_class2)  # Ensure it's appended as a string
                     text_color.append(text_color1)
 
-        
         # Update label text with both class and color information
         classes_color_all = []
         classes_color_all_prob = []
@@ -221,6 +220,7 @@ def camera_input(model, classifier, cap):
         print(classes_color_all)
         output_dodelido = calculate_dodelido_output(classes_color_all)
         output_label.config(text=f"{output_dodelido}")
+
 
         # ------------------------------------------------------------#
         # Capture the latest frame and transform to 

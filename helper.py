@@ -161,7 +161,7 @@ def calculate_dodelido_output(output_list):
         Output: String value containing the output if dodelido game.
     """
     element_counts = Counter(output_list)
-
+    print(output_list)
     if "Alarm" in output_list:
         return "Alarm"
 
@@ -239,9 +239,8 @@ def model_lite_predict(interpreter, image, classifier, threshold: float = 0.5):
 
     predicted_classes = []
     for index in class_indices:
-        one_hot = np.zeros((1, len(classifier.classes_)))
-        one_hot[0, index] = 1
-        class_name = classifier.inverse_transform(one_hot)[0]
+        class_name = classifier.classes_[index]  # Directly get the class name from the index
         predicted_classes.append(class_name)
 
     return predicted_classes, confidence_scores
+

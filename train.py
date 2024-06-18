@@ -58,6 +58,12 @@ def main():
     # number of unique labels
     N_LABELS = len(mlb.classes_)
 
+    # Save the MultiLabelBinarizer
+    with open('./Dataset/classifier.pkl', 'wb') as f:
+        joblib.dump(mlb, f)  # Use joblib.dump for this code
+
+    print("MultiLabelBinarizer saved as classifier.pkl")
+
 
     # create dataset
     train = create_dataset(
