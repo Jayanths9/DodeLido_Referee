@@ -121,7 +121,7 @@ def load_image(VideoCapture=False):
         """
 
     if VideoCapture == True:
-       image = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+       image = cv2.VideoCapture(1, cv2.CAP_DSHOW)
 
        if not cap.isOpened():
           print("Error opening camera")
@@ -168,44 +168,45 @@ def calculate_dodelido_output(output_list):
     sloth_count = element_counts["Sloth"]
 
     if sloth_count > 0:
-
         if sloth_count == 1:
             dode_output = "Oh-"
+            
         elif sloth_count == 2:
             dode_output = "Oh-Oh-"
+            
         elif sloth_count == 3:
             dode_output = "Oh-Oh-Oh-"
+            element_counts = []
         # Remove Sloth from list
 
     else:
         dode_output = ""
 
-    element_counts.subtract(["Sloth"])
-    max_count = max(element_counts.values())
-
-    # Find the element(s) with the maximum count (considering first instance)
-    max_value_elements = [element for element, count in element_counts.items()
-                          if count == max_count and element_counts[
-                              element] == count]
-
-    # Print the maximum count and element(s) (if there are multiple)
-    if max_value_elements:
-
-        if len(max_value_elements) > 1:
-            if max_count >= len(max_value_elements):
-                element = "DODELIDO"
-            elif max_count == 1:
-                element = "Nothing"
+    element_counts.subtract(["Sloth"])   
+    if len(element_counts)  > 0 :
+        max_count = max(element_counts.values())
+        # Find the element(s) with the maximum count (considering first instance)
+        max_value_elements = [element for element, count in element_counts.items() if count == max_count and element_counts[element] == count]
+    
+        # Print the maximum count and element(s) (if there are multiple)
+        if max_value_elements:
+            if len(max_value_elements) > 1:
+                if max_count >= len(max_value_elements):
+                    element = "DODELIDO"
+                elif max_count == 1:
+                    element = "Nothing"
+                else:
+                    element = max_value_elements
             else:
-                element = max_value_elements
+                element = max_value_elements[0]
+
+            print(f"Element: {element} (Maximum count: {max_count})")
+
         else:
-            element = max_value_elements[0]
-
-        print(f"Element: {element} (Maximum count: {max_count})")
-
+            element = "Nothing"
+            print("No elements were repeated")
     else:
         element = "Nothing"
-        print("No elements were repeated")
 
     return dode_output + str(element)
 
@@ -221,12 +222,26 @@ def model_lite_predict(interpreter, image, classifier, threshold: float = 0.5):
     image_resized = cv2.resize(image, (224, 224))
     image_normalized = image_resized.astype(np.float32) / 255.0
     expanded_tensor = np.expand_dims(image_normalized, axis=0)
+
     input_index = interpreter.get_input_details()[0]["index"]
     output_index = interpreter.get_output_details()[0]["index"]
+
     interpreter.set_tensor(input_index, expanded_tensor)
     interpreter.invoke()
     predictions = interpreter.get_tensor(output_index)
-    output = tf.sigmoid(predictions)
-    binary_array = np.where(np.array(output) > threshold, 1, 0)
-    result = classifier.inverse_transform(binary_array)
-    return list(result[0])
+
+    # Ensure predictions have a shape compatible with confidence score calculation
+    if len(predictions.shape) == 1:
+        predictions = np.expand_dims(predictions, axis=0)  # Add batch dimension if missing
+
+    class_indices = np.argsort(predictions[0])[::-1]  # Sort indices by prediction confidence score in descending order
+    confidence_scores = predictions[0][class_indices]  # Sort the confidence scores
+
+    predicted_classes = []
+    for index in class_indices:
+        one_hot = np.zeros((1, len(classifier.classes_)))
+        one_hot[0, index] = 1
+        class_name = classifier.inverse_transform(one_hot)[0]
+        predicted_classes.append(class_name)
+
+    return predicted_classes, confidence_scores

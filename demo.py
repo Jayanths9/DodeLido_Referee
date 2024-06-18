@@ -12,6 +12,7 @@ from ttkbootstrap.constants import *
 class_names = ["Alarm", "Blue", "Flamingo", "Giraffe", "Green", "Grey", "Lion",
                "Monkey", "Pink", "Sloth", "Snake", "Yellow"]
 color = (0, 255, 0)  # Green
+stop_camera = False
 
 
 def close_window():
@@ -19,8 +20,12 @@ def close_window():
     app.destroy()  # Destroys the main window
 
 
-def image_input(model, classifier, frame):
+def close_window_video(video_capture, app):
+    video_capture.release()
+    app.quit()
 
+
+def image_input(model, classifier, frame):
     interpreter, mlb = load_model_lite(model, classifier)
     # frame = cv2.imread(image)
     b, g, r = cv2.split(frame)
@@ -50,6 +55,7 @@ def image_input(model, classifier, frame):
         filtered_circles = filter_overlapping_circles(circles, min_dist_between_circles)
         text_class = []
         text_color = []
+        text_class_prob = []
 
 
         # Loop over all detected circles
@@ -70,45 +76,43 @@ def image_input(model, classifier, frame):
             roi = cv2.resize(roi, (224, 224))  # Assuming your model expects 224x224 input
 
             # predit the class of cropped card image
-            predictions = model_lite_predict(interpreter=interpreter,
-                                             image=roi, classifier=mlb)
-
-            # Draw the bounding box on the original image
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-
-
-            # Sort predictions in descending order and get top two classes
-            sorted_indices = np.argsort(predictions)[::-1][:2]
-            top_two_classes = [class_names[i] for i in sorted_indices]
+            class_names, confidence_scores = model_lite_predict(interpreter=interpreter, image=roi, classifier=mlb)
 
             # Draw bounding box
-            cv2.rectangle(roi, (x1, y1), (x2, y2), color, 2)
+            cv2.rectangle(frame, (x1, y1), (x2,y2), color, 2)
+            
+            # Sort predictions in descending order and get top two classes
+            top_two_classes = class_names[:2]
+            top_two_confidences = confidence_scores[:2]
+
 
             # Get dominant color within circle
             bgr_color = get_dominant_color(roi, r, y, x)
 
             # Display top two class names, probabilities, dominant color (BGR)
-            y_offset = 0  # Adjust offset based on font size
-            for j, (class_name) in enumerate(predictions):
-                # if probability > 0.5:
-                    # text_class1 = f"{class_name}: {probability:.2f}"
-                text_class2 = f"{class_name}"
-                text_color1 = f"BGR: ({int(bgr_color[0])}, " \
-                              f"{int(bgr_color[1])}, " \
-                              f"{int(bgr_color[2])})"
-                cv2.putText(roi, text_class2, (x1, y1 - y_offset * (j + 1)),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 1)
+            y_offset = 20  # Adjust offset based on font size
+            for j, (class_name, confidence) in enumerate(zip(top_two_classes, top_two_confidences)):
+                if confidence > 0.5:
+                    text_class1 = f"{class_name}: {confidence:.2f}"
+                    text_class2 = f"{class_name}"
+                    text_color1 = f"BGR: ({int(bgr_color[0])}, {int(bgr_color[1])}, {int(bgr_color[2])})"
+                    cv2.putText(frame, text_class1, (x1, y1 - y_offset * (j + 1)),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 1)
 
-                # text_class_prob.append(text_class1)
-                text_class.append(text_class2)
-                text_color.append(text_color1)
+                    text_class_prob.append(text_class1)
+                    text_class.append(text_class2)
+                    text_color.append(text_color1)
 
             # Update label text with both class and color information
         classes_color_all = []
-        # classes_color_all_prob = []
+        classes_color_all_prob = []
 
-        for classes in text_class :
+        for classes, prob in zip(text_class, text_class_prob):
+            classes_color_all_prob.append(prob)
             classes_color_all.append(classes)
+
+        classes_color_all_reshaped = [classes_color_all_prob[i:i + 2] for i in range(0, len(classes_color_all_prob), 2)]
+        text_label.config(text=f"{classes_color_all_reshaped}")
         # ------------------------------------------------------------#
 
         output_dodelido = calculate_dodelido_output(classes_color_all)
@@ -134,110 +138,113 @@ def image_input(model, classifier, frame):
         print("No Circles Detected")
 
 
-def camera_input(model, classifier):
+def camera_input(model, classifier, cap):
+    ret, frame = cap.read()
     interpreter, mlb = load_model_lite(model, classifier)
-    video_capture = cv2.VideoCapture(0)
-    while True:
-        # read image from camera
-        success, frame = video_capture.read()
-        # if input from camera
-        if success:
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            # Use Hough Circle Transform to detect circles
-            blurred = cv2.GaussianBlur(gray, (11, 11), 0)
-            circles = cv2.HoughCircles(
-                blurred,
-                cv2.HOUGH_GRADIENT,
-                dp=1,
-                minDist=50,
-                param1=100,
-                param2=30,
-                minRadius=10,
-                maxRadius=150
-            )
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    # Use Hough Circle Transform to detect circles
+    blurred = cv2.GaussianBlur(gray, (11, 11), 0)
+    circles = cv2.HoughCircles(
+        blurred,
+        cv2.HOUGH_GRADIENT,
+        dp=1,
+        minDist=50,
+        param1=100,
+        param2=30,
+        minRadius=10,
+        maxRadius=150)
 
-            results = []
-            buffer = 10
-            if circles is not None:
-                # Convert the (x, y) coordinates and radius of the circles to integers
-                circles = circles.astype(int)
-                min_dist_between_circles = 100  # Adjust this value as needed
-                filtered_circles = filter_overlapping_circles(circles, min_dist_between_circles)
-                text_class = []
-                text_color = []
+    results = []
+    buffer = 10
+        
+    if circles is not None:
+        print("Loop Entered")
+        # Convert the (x, y) coordinates and radius of the circles to integers
+        circles = circles.astype(int)
+        min_dist_between_circles = 100  # Adjust this value as needed
+        filtered_circles = filter_overlapping_circles(circles, min_dist_between_circles)
+        text_class = []
+        text_color = []
+        text_class_prob = []
+                
+        # Loop over all detected circles
+        for circle in filtered_circles:
 
-                # Loop over all detected circles
-                for circle in filtered_circles:
+            # Extract the coordinates and radius of the circle
+            x, y, r = circle
 
-                    # Extract the coordinates and radius of the circle
-                    x, y, r = circle
+            # Draw the bounding box around the circle
+            x1 = x - r-buffer
+            y1 = y - r-buffer
+            x2 = x + r+buffer
+            y2 = y + r+buffer
 
-                    # Draw the bounding box around the circle
-                    x1 = x - r-buffer
-                    y1 = y - r-buffer
-                    x2 = x + r+buffer
-                    y2 = y + r+buffer
+            # crop out the card image
+            new_image = cv2.cvtColor(frame[y1:y2, x1:x2], cv2.COLOR_BGR2RGB)
 
-                    # crop out the card image
-                    new_image = cv2.cvtColor(frame[y1:y2, x1:x2], cv2.COLOR_BGR2RGB)
+            # predit the class of cropped card image
+            class_names, confidence_scores = model_lite_predict(interpreter=interpreter, image=new_image, classifier=mlb)
 
-                    # predit the class of cropped card image
-                    predictions = model_lite_predict(interpreter=interpreter, image=new_image, classifier=mlb)
+            # Draw the bounding box on the original image
+            cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 1)
 
-                    # Draw the bounding box qon the original image
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 1)
+            # Sort predictions in descending order and get top two classes
+            top_two_classes = class_names[:2]
+            top_two_confidences = confidence_scores[:2]
 
-                    # Get dominant color within circle
-                    bgr_color = get_dominant_color(new_image, r, y, x)
+            # Get dominant color within circle
+            bgr_color = get_dominant_color(new_image, r, y, x)
 
-                    # Display top two class names, probabilities, dominant color (BGR)
-                    y_offset = 0  # Adjust offset based on font size
-                    for j, (class_name) in enumerate(predictions):
-                        # if probability > 0.5:
-                        # text_class1 = f"{class_name}: {probability:.2f}"
-                        text_class2 = f"{class_name}"
-                        text_color1 = f"BGR: ({int(bgr_color[0])}, " \
-                                      f"{int(bgr_color[1])}, " \
-                                      f"{int(bgr_color[2])})"
-                        cv2.putText(new_image, text_class2,
-                                    (x1, y1 - y_offset * (j + 1)),
-                                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 1)
+            # Display top two class names, probabilities, dominant color (BGR)
+            y_offset = 20  # Adjust offset based on font size
+            for j, (class_name, confidence) in enumerate(zip(top_two_classes, top_two_confidences)):
+                if confidence > 0.3:
+                    text_class1 = f"{class_name}: {confidence:.2f}"
+                    text_class2 = f"{class_name}"
+                    text_color1 = f"BGR: ({int(bgr_color[0])}, {int(bgr_color[1])}, {int(bgr_color[2])})"
+                    cv2.putText(frame, text_class1, (x1, y1 - y_offset * (j + 1)),
+                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 1)
 
-                        # text_class_prob.append(text_class1)
-                        text_class.append(text_class2)
-                        text_color.append(text_color1)
+                    text_class_prob.append(text_class1)
+                    text_class.append(text_class2)
+                    text_color.append(text_color1)
 
-            classes_color_all = []
-            # classes_color_all_prob = []
+        
+        # Update label text with both class and color information
+        classes_color_all = []
+        classes_color_all_prob = []
 
-            for classes in text_class:
-                classes_color_all.append(classes)
-            # ------------------------------------------------------------#
+        for classes, prob in zip(text_class, text_class_prob):
+            classes_color_all_prob.append(prob)
+            classes_color_all.append(classes)
+        # ------------------------------------------------------------#
+        print(classes_color_all)
+        output_dodelido = calculate_dodelido_output(classes_color_all)
+        output_label.config(text=f"{output_dodelido}")
 
-            output_dodelido = calculate_dodelido_output(classes_color_all)
-            output_label.config(text=f"{output_dodelido}")
+        # ------------------------------------------------------------#
+        # Capture the latest frame and transform to 
 
-            # ------------------------------------------------------------#
-            # Capture the latest frame and transform to image
-            captured_image = Image.fromarray(frame)
+    else:
+        text_label.config(text="No circles detected")
+    
+    b, g, r = cv2.split(frame)
+    frame = cv2.merge((r, g, b))
 
-            captured_image = captured_image.resize((1280, 720))
+    captured_image = Image.fromarray(frame)
+    captured_image = captured_image.resize((1280, 720))
 
-            # Convert captured image to photoimage
-            photo_image = ImageTk.PhotoImage(image=captured_image)
+    # Convert captured image to photoimage
+    photo_image = ImageTk.PhotoImage(image=captured_image)
 
-            # Displaying photoimage in the label
-            label_widget.photo_image = photo_image
+    # Displaying photoimage in the label
+    label_widget.photo_image = photo_image
 
-            # Configure image in the label
-            label_widget.configure(image=photo_image, padx=10, pady=10)
-
-            # press q to exit the cv2 window
-            if cv2.waitKey(1) & 0xFF == ord("q"):
-                break
-    video_capture.release()
-    cv2.destroyAllWindows()
-
+    # Configure image in the label
+    label_widget.configure(image=photo_image, padx=10, pady=10)
+    label_widget.after(10, camera_input, model, classifier, cap)
+   
+                 
 
 if __name__ == "__main__":
 
@@ -274,17 +281,21 @@ if __name__ == "__main__":
         button_font = ("Roboto", 10)  # Adjust font as desired
         button_width = 50
 
+        
+        def input_camera_call(): 
+            cap= cv2.VideoCapture(0)     
+            return camera_input(args.model, args.classifier, cap)
+        
+        def input_camera_close():
+            cap= cv2.VideoCapture(0)
+            return close_window_video(cap, app)
 
-        def input_image_call():
-            return camera_input(args.model, args.classifier)
 
-
-        button1 = ttk.Button(app, text="Open Camera",
-                             command=input_image_call,
+        button1 = ttk.Button(app, text="Open Camera", command=input_camera_call,
                              width=button_width, bootstyle=SUCCESS,
                              padding=5)
         button2 = ttk.Button(app, text="Close Window",
-                             command=close_window,
+                             command=input_camera_close,
                              width=button_width, bootstyle=(INFO, OUTLINE),
                              padding=5)
 
