@@ -32,8 +32,7 @@ Till then DodeLido !!!!!
 - [ ] Close Window Button not working 
 
 
-### Detect Single card
-- Images are resized to 256x256x3.
-- Each card has two labels i.e. colour of the card & animal on the card.
-- Alarm and Sloth cards are labelled as ('alarm, 'alarm') & ('sloth', 'sloth').
-- Neural network has to be trained to classify the card on two labels.
+### Usage
+1. Use install_dependencies to download all necessary library files.
+2. Install the dataset for single Image in the path "./Dataset/".
+3. Run the file main.py

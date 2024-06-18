@@ -1,6 +1,7 @@
 import tensorflow as tf
 import cv2
 import numpy as np
+import joblib
 
 from collections import Counter
 
@@ -207,3 +208,25 @@ def calculate_dodelido_output(output_list):
         print("No elements were repeated")
 
     return dode_output + str(element)
+
+
+def load_model_lite(litemodel: str, classifier:str):
+    interpreter = tf.lite.Interpreter(model_path=str(litemodel))
+    interpreter.allocate_tensors()
+    mlb = joblib.load(classifier)
+    return interpreter, mlb
+
+
+def model_lite_predict(interpreter, image, classifier, threshold: float = 0.5):
+    image_resized = cv2.resize(image, (224, 224))
+    image_normalized = image_resized.astype(np.float32) / 255.0
+    expanded_tensor = np.expand_dims(image_normalized, axis=0)
+    input_index = interpreter.get_input_details()[0]["index"]
+    output_index = interpreter.get_output_details()[0]["index"]
+    interpreter.set_tensor(input_index, expanded_tensor)
+    interpreter.invoke()
+    predictions = interpreter.get_tensor(output_index)
+    output = tf.sigmoid(predictions)
+    binary_array = np.where(np.array(output) > threshold, 1, 0)
+    result = classifier.inverse_transform(binary_array)
+    return list(result[0])
