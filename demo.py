@@ -148,17 +148,16 @@ def camera_input(model, classifier, cap):
         blurred,
         cv2.HOUGH_GRADIENT,
         dp=1,
-        minDist=50,
+        minDist=100,
         param1=100,
         param2=30,
-        minRadius=10,
+        minRadius=50,
         maxRadius=150)
 
     results = []
     buffer = 10
         
     if circles is not None:
-        print("Loop Entered")
         # Convert the (x, y) coordinates and radius of the circles to integers
         circles = circles.astype(int)
         min_dist_between_circles = 100  # Adjust this value as needed
@@ -198,7 +197,7 @@ def camera_input(model, classifier, cap):
             # Display top two class names, probabilities, dominant color (BGR)
             y_offset = 20  # Adjust offset based on font size
             for j, (class_name, confidence) in enumerate(zip(top_two_classes, top_two_confidences)):
-                if confidence > 0.5:
+                if confidence > 0.1:
                     text_class1 = f"{class_name}: {confidence:.2f}"
                     text_class2 = class_name  # Extract class name as a simple string
                     text_color1 = f"BGR: ({int(bgr_color[0])}, {int(bgr_color[1])}, {int(bgr_color[2])})"
@@ -216,14 +215,14 @@ def camera_input(model, classifier, cap):
         for classes, prob in zip(text_class, text_class_prob):
             classes_color_all_prob.append(prob)
             classes_color_all.append(classes)
+
+        classes_color_all_reshaped = [classes_color_all_prob[i:i + 2] for i in range(0, len(classes_color_all_prob), 2)]
+        text_label.config(text=f"{classes_color_all_reshaped}")
+
         # ------------------------------------------------------------#
-        print(classes_color_all)
         output_dodelido = calculate_dodelido_output(classes_color_all)
         output_label.config(text=f"{output_dodelido}")
 
-
-        # ------------------------------------------------------------#
-        # Capture the latest frame and transform to 
 
     else:
         text_label.config(text="No circles detected")
