@@ -53,9 +53,10 @@ To prepare the dataset, we took images of all the cards and used OpenCV to extra
 ### Output
 Below you can find predictions from the trained model for a few images:
   <p align="center">
-  <img src="https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/1c972f70-9a59-4770-8415-9d666caa5d30" width="600">
+  <img src="https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/d7fcb32b-f62c-4c23-abf3-943a0b9cb3eb" width="600">
   </p>
 
+  [![Watch the video](https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/5d3a415d-9267-4446-83b2-d35bbc080f2f)](https://youtu.be/SMLzawoyK6s)
 
 ## Suggestions: 
 - We are open to suggestions or any bugs that you find. You can contact us through the Issues tab in this repository. 
