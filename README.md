@@ -23,16 +23,3 @@ Till then DodeLido !!!!!
 
 ### Link to Dataset : [Click Here](https://drive.google.com/file/d/1t_2G9JKH61lNrjjcBCieCkRvlT0-tz4p/view?usp=sharing)
 
-### TODO
-- [X] Capture images of DodeLido cards. 
-- [x] Resize and label images.
-- [X] Augmented images and create coressponding labels.
-- [X] Train neural network to detect single single card.
-- [X] Write python logic to guess the outcome based on three cards, e.g Blue, Lion , Dodelio etc.
-- [ ] Close Window Button not working 
-
-
-### Usage
-1. Use install_dependencies to download all necessary library files.
-2. Install the dataset for single Image in the path "./Dataset/".
-3. Run the file main.py
