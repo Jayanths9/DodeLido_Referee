@@ -252,14 +252,14 @@ if __name__ == "__main__":
 
     # Subparser for camera
     parser_camera = subparsers.add_parser("camera", help="Run with camera input")
-    parser_camera.add_argument("--model", type=str, default="./Dataset/trained_model.tflite",help="Path to trained model for image function")
-    parser_camera.add_argument("--classifier", type=str, default="./Dataset/classifier.pkl", help="Path to classifier for image function")
+    parser_camera.add_argument("--model", type=str, default="./resources/trained_model.tflite",help="Path to trained model for image function")
+    parser_camera.add_argument("--classifier", type=str, default="./resources/classifier.pkl", help="Path to classifier for image function")
 
     # Subparser for image
     parser_image = subparsers.add_parser("image", help="Run on local image")
-    parser_image.add_argument("--model", type=str, default="./Dataset/trained_model.tflite",help="Path to trained model for image function")
-    parser_image.add_argument("--classifier", type=str, default="./Dataset/classifier.pkl", help="Path to classifier for image function")
-    parser_image.add_argument("--imagepath", type=str, default="./Dataset/trialImage3.jpg", help="Path to image for image function")
+    parser_image.add_argument("--model", type=str, default="./resources/trained_model.tflite",help="Path to trained model for image function")
+    parser_image.add_argument("--classifier", type=str, default="./resources/classifier.pkl", help="Path to classifier for image function")
+    parser_image.add_argument("--imagepath", type=str, default="./resources/trialImage3.jpg", help="Path to image for image function")
 
     args = parser.parse_args()
 
@@ -320,7 +320,7 @@ if __name__ == "__main__":
             app.bind('<Escape>', lambda e: app.quit())
             app.geometry("1280x850")
 
-            photo = tk.PhotoImage(file='./Dataset/WelcomeScreen.png',
+            photo = tk.PhotoImage(file='./resources/WelcomeScreen.png',
                                   master=app)
             label_widget = Label(app, padx=10, pady=10, image=photo)
             label_widget.pack()

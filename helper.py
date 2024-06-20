@@ -127,7 +127,7 @@ def load_image(VideoCapture=False):
           print("Error opening camera")
           exit()
     else:
-       image = cv2.imread('./Dataset/trialImage3.JPG')
+       image = cv2.imread('./resources/trialImage3.JPG')
        image = cv2.resize(image, (1280, 720))
 
     return image

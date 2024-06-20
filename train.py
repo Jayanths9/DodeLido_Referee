@@ -20,8 +20,8 @@ tf.random.set_seed(seed)
 
 def main():
     parser = argparse.ArgumentParser(description="Configure the script parameters.")
-    parser.add_argument("--label", type=str, default="./Dataset/labels.json", help="Path to the labels file.")
-    parser.add_argument("--image", type=str, default="./Dataset/Images/", help="Directory containing the images.")
+    parser.add_argument("--label", type=str, default="./resources/labels.json", help="Path to the labels file.")
+    parser.add_argument("--image", type=str, default="./resources/Images/", help="Directory containing the images.")
     parser.add_argument("--batchsize", type=int, default=100, help="Batch size for training.")
     parser.add_argument("--patience", type=int, default=5, help="Patience for early stopping.")
     parser.add_argument("--lr", type=float, default=5e-4, help="Learning rate for training.")
@@ -59,7 +59,7 @@ def main():
     N_LABELS = len(mlb.classes_)
 
     # Save the MultiLabelBinarizer
-    with open('./Dataset/classifier.pkl', 'wb') as f:
+    with open('./resources/classifier.pkl', 'wb') as f:
         joblib.dump(mlb, f)  # Use joblib.dump for this code
 
     print("MultiLabelBinarizer saved as classifier.pkl")
