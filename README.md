@@ -1,7 +1,6 @@
 # DodeLido Referee- A Deep Learning Project
 
-DodeLido is an amazing card game that keeps you on your toes. The game is simple, each player will put one card in turn in a triangle format and then the player has to tell what is the majority, either the colour or the animal and in case there is a clash, you have to say DodeLido. Simple! And there is sloth and alarm also. 
-
+DodeLido is an amazing card game that keeps you on your toes. The game is simple, each player will put one card in turn in a triangle format and then the player has to call out what is the majority, either the colour or the animal and in case there is a clash, the player has to call DodeLido. The player who finishes all the cards in their hand, Wins! Simple! And there is sloth and alarm also. 
 
 <p align="center">
   <img src="https://github.com/Jayanths9/Dodelido_opencv/assets/9052405/d8003dd2-108d-4b64-97fd-904f702442a0" width="500">
@@ -52,7 +51,10 @@ To prepare the dataset, we took images of all the cards and used OpenCV to extra
 5. **GUI Integration:**  We built a basic graphical user interface (GUI) with Tkinter. This GUI provides buttons to start and stop the camera feed, displays the processed video with detections, and allows the user to close the application window.
 
 ### Output
-Below you can find predictions from the trained model for few images:
+Below you can find predictions from the trained model for a few images:
+  <p align="center">
+  <img src="https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/1c972f70-9a59-4770-8415-9d666caa5d30" width="600">
+  </p>
 
 
 ## Suggestions: 
