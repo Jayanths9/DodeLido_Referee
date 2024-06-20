@@ -1,6 +1,6 @@
 # DodeLido Referee- A Deep Learning Project
 
-DodeLido is an amazing card game that keeps you on your toes. The game is simple, each player will put one card in turn in a triangle format and then the player has to call out what is the majority, either the colour or the animal and in case there is a clash, the player has to call DodeLido. The player who finishes all the cards in their hand, Wins! Simple! And there is sloth and alarm also. 
+DodeLido is an amazing card game that keeps you on your toes. The game is simple, each player will put one card in turn in a triangle format and then the player has to call out what is the majority, either the colour or the animal and in case there is a clash, the player has to call DodeLido. The player who finishes all the cards from their hand, Wins! Simple! And there is sloth and alarm as well. 
 
 <p align="center">
   <img src="https://github.com/Jayanths9/Dodelido_opencv/assets/9052405/d8003dd2-108d-4b64-97fd-904f702442a0" width="500">
@@ -24,7 +24,7 @@ P.S. Yes, we have merged the basic DodeLido game with the DodeLido Extreme versi
    ```
    python demo.py camera 
    ```
-4. To use default image, run the command:
+4. To use the default image, run the command:
    ```
    python demo.py image --imagepath "./resources/trialImage3.jpg" 
    ```
@@ -56,7 +56,7 @@ Below you can find predictions from the trained model for a few images:
   <img src="https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/d7fcb32b-f62c-4c23-abf3-943a0b9cb3eb" width="600">
   </p>
 
-  [![Watch the video](https://github.com/Jayanths9/DodeLido_Referee/assets/9052405/5d3a415d-9267-4446-83b2-d35bbc080f2f)](https://youtu.be/SMLzawoyK6s)
+  
 
 ## Suggestions: 
 - We are open to suggestions or any bugs that you find. You can contact us through the Issues tab in this repository. 
