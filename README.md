@@ -25,6 +25,10 @@ P.S. Yes, we have merged the basic DodeLido game with the DodeLido Extreme versi
    ```
    python demo.py camera 
    ```
+4. To use default image, run the command:
+   ```
+   python demo.py image --imagepath "./resources/trialImage3.jpg" 
+   ```
 ## Implementation
 
 ### Dataset Preparation:
@@ -46,6 +50,9 @@ To prepare the dataset, we took images of all the cards and used OpenCV to extra
 3. **Preprocessing and Prediction:**  For each detected circle, we crop the region of interest (ROI) around it.  We then pre-process the ROI by resizing it and converting it to the format expected by our model.  Finally, we use the loaded TFLite model to make predictions on the preprocessed ROI.
 4. **Result Display and Text Update:** After predictions are complete, we draw a bounding box around the detected circle and display the predicted class names, confidence scores, and the dominant colour of the circle on the frame.  We use OpenCV's text rendering functions for this purpose.
 5. **GUI Integration:**  We built a basic graphical user interface (GUI) with Tkinter. This GUI provides buttons to start and stop the camera feed, displays the processed video with detections, and allows the user to close the application window.
+
+### Output
+Below you can find predictions from the trained model for few images:
 
 
 ## Suggestions: 
