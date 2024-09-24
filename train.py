@@ -60,8 +60,8 @@ def main():
     # Fit the multi-label Binarizer on the training set
     mlb = MultiLabelBinarizer()
     y_train_bin = mlb.fit_transform(y_train)
-    y_test_bin = mlb.fit_transform(y_test)
-    y_val_bin = mlb.fit_transform(y_val)
+    y_test_bin = mlb.transform(y_test)
+    y_val_bin = mlb.transform(y_val)
 
     # number of unique labels
     n_labels = len(mlb.classes_)
